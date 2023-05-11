@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { items } from './data';
+import { products } from "./data.js";
+
 /*
 Thinking in React: https://reactjs.org/docs/thinking-in-react.html
 
@@ -24,22 +25,34 @@ Step 5: Add Inverse Data Flow
 
 function ProductCategoryRow({ category }) {
   return (
-    <tr>
-      <td>{category}</td>
+    <tr style={{ fontWeight: "bold" }}>
+      <td colSpan="2">{category}</td>
     </tr>
   )
 }
 
 function ProductRow({ price, stocked, name }) {
+  const style = stocked ? null : { color: "red", fontWeight: "bold" }
   return (
     <tr>
-      <td style={{ color: stocked ? "black" : "red" }}>{name}</td>
+      <td style={style}>{name}</td>
       <td>{price}</td>
     </tr>
   )
 }
 
-function ProductTable() {
+function ProductTable({ products }) {
+
+  const rows = [];
+  let lastCategory;
+  for (const product of product.category(products)) {
+    if (product.category !== lastCategory) {
+      rows.push(<ProductCategoryRow key={product.category} category={product.category} />)
+    }
+    rows.push(<ProductRow key={product.name} name={product.name} stocked={product.stocked} price={product.price} />)
+    lastCategory = product.category
+  }
+
   return (
     <table>
       <thead>
@@ -49,14 +62,7 @@ function ProductTable() {
         </tr>
       </thead>
       <tbody>
-        <ProductCategoryRow category="Sporting Goods" />
-        <ProductRow name="Football" stocked={true} price={49.99} />
-        <ProductRow name="Baseball" stocked={true} price={9.99} />
-        <ProductRow name="Basketball" stocked={false} price={29.99} />
-        <ProductCategoryRow category="Electronics" />
-        <ProductRow name="iPod Touch" stocked={true} price={49.99} />
-        <ProductRow name="iPhone 5" stocked={false} price={9.99} />
-        <ProductRow name="Nexus 7" stocked={true} price={29.99} />
+        {rows}
       </tbody>
     </table>
   )
@@ -64,7 +70,7 @@ function ProductTable() {
 
 function SearchBar() {
   return (
-    <form style={{ padding: "5px", border: "1px solid blue", display: "flex", flexDirection: "column" }}>
+    <form style={{ padding: "10px", display: "flex", flexDirection: "column" }}>
       <input type="text" placeholder="Search..." />
       <label>
         <input type="checkbox" />
@@ -74,11 +80,11 @@ function SearchBar() {
   )
 }
 
-function FilterableProductTable() {
+function FilterableProductTable({ products }) {
   return (
-    <div style={{ padding: "5px", border: "1px solid orange" }}>
+    <div>
       <SearchBar />
-      <ProductTable />
+      <ProductTable products={products} />
     </div>
   )
 }
